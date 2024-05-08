@@ -11,8 +11,6 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from sklearn.metrics import roc_auc_score
-from pneumonia_data import PneumoniaDataSet
-from torchvision.models import densenet121, DenseNet121_Weights
 from sklearn.metrics import mean_squared_error
 
 pathology = 'Pleural Effusion'
