@@ -10,7 +10,11 @@ class PneumoniaDataSet(Dataset):
     def __init__(self, data_dir, image_list_file, transform=None):
         self.data_frame = pd.read_csv(image_list_file)
         self.data_frame = self.data_frame[self.data_frame['Frontal/Lateral'] == 'Frontal']
-
+        self.data_frame = self.data_frame.dropna(subset=['Pneumonia'])
+        
+        # Normalize labels for pneumonia (assuming 1.0 is positive and anything else is negative)
+        self.data_frame['Pneumonia'] = self.data_frame['Pneumonia'].apply(lambda x: 1 if x == 1.0 else 0)
+        
         # Use a method to extract PID
         self.data_frame['pid'] = self.data_frame['Path'].apply(self.extract_pid)
         # Filter data to include only specific patient IDs
@@ -35,7 +39,7 @@ class PneumoniaDataSet(Dataset):
 
     def __getitem__(self, index):
         image_path = self.data_frame.iloc[index]['Path']
-        print("Attempting to open:", image_path)
+        # print("Attempting to open:", image_path)
         image = Image.open(image_path).convert('RGB')
         # Focus on pneumonia only (assuming 'Pneumonia' is a column in your CSV)
         pneumonia_label = self.data_frame.iloc[index]['Pneumonia']
