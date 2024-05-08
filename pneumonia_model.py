@@ -14,14 +14,6 @@ from sklearn.metrics import mean_squared_error
 
 
 class DenseNet121(nn.Module):
-    # def __init__(self):
-    #     super(DenseNet121, self).__init__()
-    #     self.densenet121 = torchvision.models.densenet121(pretrained=True)
-    #     num_ftrs = self.densenet121.classifier.in_features
-    #     self.densenet121.classifier = nn.Sequential(
-    #         nn.Linear(num_ftrs, 1),
-    #         nn.Sigmoid()
-    #     )
     def __init__(self):
         super(DenseNet121, self).__init__()
         self.densenet121 = densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
@@ -59,9 +51,9 @@ if __name__ == '__main__':
 
     # Example to setup test_loader
     # You must define DATA_DIR and IMAGE_LIST_FILE or adjust as per your setup
-    DATA_DIR = '/Users/jamiekwon/CS156b/CS156b'
-    IMAGE_LIST_FILE = '/Users/jamiekwon/CS156b/CS156b/labels/labels.csv'
-    test_dataset = PneumoniaDataSet(data_dir=DATA_DIR, image_list_file=IMAGE_LIST_FILE, transform=transforms.Compose([
+    DATA_DIR = '/Users/etiennecasanova/Desktop/Caltech_classes/CS156b/'
+    IMAGE_LIST_FILE = 'labels/labels.csv'
+    test_dataset = PneumoniaDataSet(data_dir='', image_list_file=IMAGE_LIST_FILE, transform=transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor(),

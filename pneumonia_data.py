@@ -11,28 +11,6 @@ class PneumoniaDataSet(Dataset):
         self.data_frame = pd.read_csv(image_list_file)
         self.data_frame = self.data_frame[self.data_frame['Frontal/Lateral'] == 'Frontal']
         self.data_frame = self.data_frame.dropna(subset=['Pneumonia'])
-        
-    #     # Normalize labels for pneumonia (assuming 1.0 is positive and anything else is negative)
-    #     self.data_frame['Pneumonia'] = self.data_frame['Pneumonia'].apply(lambda x: 1 if x == 1.0 else 0)
-    #     self.data_frame['pid'] = self.data_frame['Path'].apply(self.extract_pid)
-    #     self.data_frame = self.data_frame[(self.data_frame['pid'] >= pid_range[0]) & (self.data_frame['pid'] <= pid_range[1])]
-
-    #     self.data_frame['Path'] = self.data_frame['Path'].apply(lambda x: os.path.join(data_dir, x))
-    #     self.transform = transform
-
-    # def extract_pid(self, path):
-    #     try:
-    #         # Assuming the PID format is something like 'pid00123'
-    #         pid = re.search(r'pid(\d+)', path)
-    #         if pid:
-    #             return int(pid.group(1))  # Extracts and converts the number part
-    #         else:
-    #             print("No PID found in path:", path)
-    #             return None  # Return None or some default value or raise an exception
-    #     except Exception as e:
-    #         print("Error processing path:", path, "; Error:", str(e))
-            # raise
-        # Use a method to extract PID
         self.data_frame['pid'] = self.data_frame['Path'].apply(self.extract_pid)
         # Filter data to include only specific patient IDs
         self.data_frame = self.data_frame[(self.data_frame['pid'] >= 1) & (self.data_frame['pid'] <= 198)]

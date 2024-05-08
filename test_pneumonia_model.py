@@ -57,8 +57,9 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Setup Datasets
-    DATA_DIR = '/Users/jamiekwon/CS156b/CS156b'
-    IMAGE_LIST_FILE = '/Users/jamiekwon/CS156b/CS156b/labels/labels.csv'
+
+    DATA_DIR = 'Desktop/CS156b'
+    IMAGE_LIST_FILE = 'labels/labels.csv'
     transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
