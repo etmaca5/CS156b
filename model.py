@@ -22,7 +22,7 @@ CKPT_PATH = 'model.pth.tar'
 CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Pneumonia', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
 N_CLASSES = len(CLASS_NAMES)
 
-DATA_DIR = '/Users/jamiekwon/CS156b/CS156b/train'
+DATA_DIR = '/Users/etiennecasanova/CS156b/train'
 TEST_IMAGE_LIST = './ChestX-ray14/labels/test_list.txt'
 BATCH_SIZE = 64
 
