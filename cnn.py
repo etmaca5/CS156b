@@ -10,12 +10,15 @@ from torch.utils.data import Dataset
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import mean_squared_error
+# import torch.distributed as dist
+# import torch.multiprocessing as mp
+# import torch.utils.data
+# import torch.utils.data.distributed
+
 
 pathology = 'Pleural Effusion'
 # will determine how we run it
-using_hpc = 0
+using_hpc = 1
 
 
 
@@ -34,10 +37,6 @@ else:
 
 
 
-transform = transforms.Compose([
-    transforms.Resize((250, 250)),
-    transforms.ToTensor()
-])
 
 
 class ImageDataset(Dataset):
@@ -120,11 +119,11 @@ X_train = ImageDataset(images_path,labels_path_train, transform)
 X_test = TestDataset(images_path,labels_path_test, transform)
 
 
-train_size = int(0.8 * len(X_train))
+train_size = int(0.9 * len(X_train))
 val_size = len(X_train) - train_size
 X_train, X_val = torch.utils.data.random_split(X_train, [train_size, val_size])
 
-batch = 128
+batch = 64
 
 train_dataloader = DataLoader(X_train, batch_size=batch, shuffle=True)
 val_dataloader = DataLoader(X_val, batch_size=batch, shuffle=True)
@@ -156,13 +155,16 @@ model = nn.Sequential(
     nn.Linear(128 * 26 * 26, 128),
     nn.ReLU(),
     nn.Linear(128, 8),
-).to(device)
+)
+if torch.cuda.device_count() > 1:
+    model = torch.nn.DataParallel(model)
+model.to(device)
 
 criterion = nn.MSELoss()
 learning_rate= 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-n_epochs = 1
+n_epochs = 6
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
