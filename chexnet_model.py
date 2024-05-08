@@ -4,6 +4,7 @@
 The main CheXNet model implementation.
 """
 
+
 import os
 import numpy as np
 import torch
@@ -12,17 +13,15 @@ import torch.backends.cudnn as cudnn
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from chexnet_read_data import ChestXrayDataSet
-import sklearn
+from read_data import ChestXrayDataSet
 from sklearn.metrics import roc_auc_score
 
 
 CKPT_PATH = 'model.pth.tar'
-
-CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Pneumonia', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
-N_CLASSES = len(CLASS_NAMES)
-
-DATA_DIR = '/Users/jamiekwon/CS156b/CS156b/train'
+N_CLASSES = 14
+CLASS_NAMES = [ 'Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia',
+                'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+DATA_DIR = './ChestX-ray14/images'
 TEST_IMAGE_LIST = './ChestX-ray14/labels/test_list.txt'
 BATCH_SIZE = 64
 
@@ -50,12 +49,15 @@ def main():
                                     image_list_file=TEST_IMAGE_LIST,
                                     transform=transforms.Compose([
                                         transforms.Resize(256),
-                                        transforms.CenterCrop(224),
-                                        transforms.ToTensor(),
-                                        normalize,
+                                        transforms.TenCrop(224),
+                                        transforms.Lambda
+                                        (lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
+                                        transforms.Lambda
+                                        (lambda crops: torch.stack([normalize(crop) for crop in crops]))
                                     ]))
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE,
                              shuffle=False, num_workers=8, pin_memory=True)
+
     # initialize the ground truth and output tensor
     gt = torch.FloatTensor()
     gt = gt.cuda()

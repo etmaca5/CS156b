@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import os
 
+
 class ChestXrayDataSet(torch.utils.data.Dataset):
     """ChestX-ray dataset."""
     def __init__(self, data_dir, image_list_file, transform=None):
