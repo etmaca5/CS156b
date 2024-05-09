@@ -21,6 +21,8 @@ pathology = 'Pleural Effusion'
 using_hpc = 1
 use_subset = True
 subset_fraction = 0.2
+n_epochs = 3
+output_name = 'cnn_base_3e.csv'
 
 
 
@@ -168,7 +170,6 @@ criterion = nn.MSELoss()
 learning_rate= 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-n_epochs = 3
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
@@ -210,16 +211,15 @@ with torch.no_grad():
     model.eval()
     for i, data in enumerate(test_dataloader):
         images, ids = data
-        images = images.to(device)  
-        ids = ids.cpu().numpy()  
-
-        outputs = model(images)
-        outputs_numpy = outputs.cpu().numpy().flatten() 
-
-        predictions.append((ids, outputs_numpy))  
+        images, ids = images.to(device), ids.to(device)
+        
+        output = np.array(model(images).cpu())
+        output = np.argmax(output, axis=1) - 1
+        for preds, id in zip(output, ids):
+            predictions.append([int(id)] + [preds])
 
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
-print(df_output)
+df_output.head()
 
 
 
@@ -232,7 +232,7 @@ else:
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-output_file_path = os.path.join(output_dir, 'predictions_cnn_smallerdata_3epoch.csv')
+output_file_path = os.path.join(output_dir, output_name)
 
 df_output.to_csv(output_file_path, index=False)
 
