@@ -71,7 +71,8 @@ class ImageDataset(Dataset):
     def __getitem__(self, index):
         image_path = self.data_frame.iloc[index]['Path']
         image = Image.open(image_path).convert('RGB')
-        label = self.data_frame.iloc[index][pathology]
+        # 0-2 labeling
+        label = self.data_frame.iloc[index][pathology] + 1
         if self.transform:
             image = self.transform(image)
         return image, torch.FloatTensor([label])  # Ensure label is still a tensor
