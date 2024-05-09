@@ -72,7 +72,7 @@ class ImageDataset(Dataset):
         image_path = self.data_frame.iloc[index]['Path']
         image = Image.open(image_path).convert('RGB')
         # 0-2 labeling
-        label = self.data_frame.iloc[index][pathology] + 1
+        label = self.data_frame.iloc[index][pathology] / 2.0 + 0.5
         if self.transform:
             image = self.transform(image)
         return image, torch.FloatTensor([label])  # Ensure label is still a tensor
@@ -104,7 +104,7 @@ class TestDataset(Dataset):
     def __getitem__(self, index):
         image_path = self.data_frame.iloc[index]['Path']
         image = Image.open(image_path).convert('RGB')
-        label = self.data_frame.iloc[index]['Id']
+        label = self.data_frame.iloc[index]['Id'] 
         if self.transform:
             image = self.transform(image)
         return image, label
@@ -137,7 +137,7 @@ val_dataloader = DataLoader(X_val, batch_size=batch, shuffle=True)
 test_dataloader = DataLoader(X_test, batch_size=batch, shuffle=False)
 
 print("completed preprocessing")
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = nn.Sequential(
     nn.Conv2d(3, 32, kernel_size=(3, 3)),
@@ -210,18 +210,21 @@ labels_of_interest = [ 'Id', pathology]
 predictions = []
 with torch.no_grad():
     model.eval()
-    for i, data in enumerate(test_dataloader):
-        images, ids = data
-        images, ids = images.to(device), ids.to(device)
-        
-        output = np.array(model(images).cpu())
-        output = np.argmax(output, axis=1) - 1
-        for preds, id in zip(output, ids):
-            predictions.append([int(id)] + [preds])
+    for images, ids in test_dataloader:
+        images = images.to(device)
+        outputs = model(images).squeeze()
+
+        # Check if outputs need further squeezing (only if batch size == 1)
+        if outputs.dim() == 0:
+            outputs = outputs.unsqueeze(0)  # Ensure outputs is always at least 1D
+
+        outputs = outputs * 2.0 - 1.0  # Scale and shift to range [-1, 1]
+
+        for output, id_val in zip(outputs, ids):
+            predictions.append([id_val.item(), output.item()])
 
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
-df_output.head()
-
+print(df_output.head())
 
 
 
