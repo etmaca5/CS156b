@@ -158,7 +158,7 @@ model = nn.Sequential(
     nn.Flatten(),
     nn.Linear(128 * 26 * 26, 128),
     nn.ReLU(),
-    nn.Linear(128, 8),
+    nn.Linear(128, 1),
 )
 if torch.cuda.device_count() > 1:
     model = torch.nn.DataParallel(model)
@@ -210,16 +210,13 @@ with torch.no_grad():
     model.eval()
     for i, data in enumerate(test_dataloader):
         images, ids = data
-        images, ids = images.to(device), ids.to(device)
+        images = images.to(device)  
+        ids = ids.cpu().numpy()  
 
         outputs = model(images)
-        probabilities_tensor = torch.softmax(outputs, dim=1)
+        outputs_numpy = outputs.cpu().numpy().flatten() 
 
-        _, predicted = torch.max(output.data, 1)
-        probabilities_numpy = probabilities_tensor.cpu().numpy()
-        ids_numpy = ids.cpu().numpy()
-
-        predictions.append[(probabilities_numpy, ids_numpy)]
+        predictions.append((ids, outputs_numpy))  
 
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
 print(df_output)
