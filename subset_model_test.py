@@ -20,7 +20,7 @@ pathology = 'Pleural Effusion'
 # will determine how we run it
 using_hpc = 1
 use_subset = True
-subset_fraction = 0.2
+subset_fraction = 0.05
 
 
 
@@ -158,7 +158,7 @@ model = nn.Sequential(
     nn.Flatten(),
     nn.Linear(128 * 26 * 26, 128),
     nn.ReLU(),
-    nn.Linear(128, 8),
+    nn.Linear(128, 1),
 )
 if torch.cuda.device_count() > 1:
     model = torch.nn.DataParallel(model)
@@ -168,7 +168,7 @@ criterion = nn.MSELoss()
 learning_rate= 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-n_epochs = 3
+n_epochs = 1
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
@@ -210,16 +210,13 @@ with torch.no_grad():
     model.eval()
     for i, data in enumerate(test_dataloader):
         images, ids = data
-        images, ids = images.to(device), ids.to(device)
+        images = images.to(device)  
+        ids = ids.cpu().numpy()  
 
         outputs = model(images)
-        probabilities_tensor = torch.softmax(outputs, dim=1)
+        outputs_numpy = outputs.cpu().numpy().flatten() 
 
-        _, predicted = torch.max(output.data, 1)
-        probabilities_numpy = probabilities_tensor.cpu().numpy()
-        ids_numpy = ids.cpu().numpy()
-
-        predictions.append[(probabilities_numpy, ids_numpy)]
+        predictions.append((ids, outputs_numpy))  
 
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
 print(df_output)
@@ -235,7 +232,7 @@ else:
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-output_file_path = os.path.join(output_dir, 'predictions_cnn_smallerdata_3epoch.csv')
+output_file_path = os.path.join(output_dir, 'predictions_test.csv')
 
 df_output.to_csv(output_file_path, index=False)
 
