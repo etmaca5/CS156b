@@ -177,7 +177,7 @@ def initialize_model():
         nn.ReLU(),
         nn.Dropout(0.5),
         nn.Linear(512, 1),
-        nn.Sigmoid()
+        nn.Tanh()
     )
     return model
 
@@ -194,17 +194,28 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
+# for epoch in range(n_epochs):
+#     model.train()
+#     for images, labels in train_dataloader:
+#         images = images.to(device)
+#         labels = labels.to(device).view(-1, 1)  # Ensure labels are the correct shape
+#         optimizer.zero_grad()
+#         outputs = model(images)
+#         loss = criterion(outputs, labels)
+#         loss.backward()
+#         optimizer.step()
+#         # Additional logging or accuracy computation here
 for epoch in range(n_epochs):
     model.train()
     for images, labels in train_dataloader:
         images = images.to(device)
-        labels = labels.to(device).view(-1, 1)  # Ensure labels are the correct shape
+        # Adjust labels from [0, 1] to [-1, 1]
+        labels = labels.to(device).view(-1, 1) * 2 - 1  # Scale labels to -1 and 1
         optimizer.zero_grad()
         outputs = model(images)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
-        # Additional logging or accuracy computation here
 
     # Validation phase
     model.eval()
@@ -219,14 +230,24 @@ for epoch in range(n_epochs):
 
 labels_of_interest = [ 'Id', pathology]
 
+# predictions = []
+# with torch.no_grad():
+#     model.eval()
+#     for images, ids in test_dataloader:
+#         images = images.to(device)
+#         outputs = model(images).squeeze()  # Adjust assuming the output is a single probability
+#         predicted_labels = (outputs > 0.5).long()  # Thresholding at 0.5
+#         predictions.extend(zip(ids.cpu().numpy(), predicted_labels.cpu().numpy()))
+
+
 predictions = []
 with torch.no_grad():
     model.eval()
     for images, ids in test_dataloader:
         images = images.to(device)
-        outputs = model(images).squeeze()  # Adjust assuming the output is a single probability
-        predicted_labels = (outputs > 0.5).long()  # Thresholding at 0.5
-        predictions.extend(zip(ids.cpu().numpy(), predicted_labels.cpu().numpy()))
+        outputs = model(images).squeeze()
+        predictions.extend(zip(ids.cpu().numpy(), outputs.cpu().numpy()))
+
 
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
 df_output.head()
