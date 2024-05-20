@@ -17,4 +17,4 @@
 
 source /home/ecasanov/CS156b/myenv/bin/activate
 cd /groups/CS156b/2024/butters
-python cnn.py
+python cnn2.py
