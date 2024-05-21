@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=CNN_cardio
+#SBATCH --job-name=resnet_1
 #SBATCH -A CS156b
 #SBATCH --time=8:00:00
 #SBATCH --ntasks=1
@@ -17,4 +17,4 @@
 
 source /home/ecasanov/CS156b/myenv/bin/activate
 cd /groups/CS156b/2024/butters
-python cnn.py
+python resnet.py
