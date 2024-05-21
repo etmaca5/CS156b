@@ -179,7 +179,7 @@ else:
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-output_file_path = os.path.join(output_dir, 'predictions_resnet152_3epoch.csv')
+output_file_path = os.path.join(output_dir, 'predictions_resnet152_enlarged_3epoch.csv')
 df_output.to_csv(output_file_path, index=False)
 
 print(f"DataFrame saved to {output_file_path}")
