@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=CNN_speedup
+#SBATCH --job-name=resnet_enlarged
 #SBATCH -A CS156b
-#SBATCH --time=16:00:00
+#SBATCH --time=8:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --gres gpu:3
-#SBATCH --mail-user=ecasanov@caltech.edu
+#SBATCH --mail-user=imantrip@caltech.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
@@ -17,4 +17,4 @@
 
 source /home/ecasanov/CS156b/myenv/bin/activate
 cd /groups/CS156b/2024/butters
-python cnn.py
+python resnet_enlarged.py

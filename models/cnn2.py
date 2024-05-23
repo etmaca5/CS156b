@@ -15,14 +15,15 @@ from torch.utils.data import DataLoader
 # import torch.utils.data
 # import torch.utils.data.distributed
 
-
-pathology = 'Pleural Effusion'
+labels_of_interest = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Pneumonia', 
+                      'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+pathology = 'Cardiomegaly'
 # will determine how we run it
 using_hpc = 1
-use_subset = True
-subset_fraction = 0.2
-n_epochs = 3
-output_name = 'cnn_base_3e.csv'
+use_subset = False
+subset_fraction = 0.5
+n_epochs = 4
+output_name = 'cnn_cardio.csv'
 
 
 
@@ -34,13 +35,6 @@ else:
     labels_path_train = 'labels/labels.csv'
     labels_path_test = 'labels/test_ids.csv'
     images_path = ''
-
-
-# otherwise 
-
-
-
-
 
 
 class ImageDataset(Dataset):
