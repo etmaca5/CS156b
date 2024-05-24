@@ -155,30 +155,25 @@ for epoch in range(n_epochs):
         validation_loss_history[epoch] = validation_loss / len(val_dataloader)
     print(f'Validation Loss: {validation_loss_history[epoch]:0.4f}')
 
+# Collect predictions for the test set
 predictions = []
 with torch.no_grad():
     model.eval()
-    for i, data in enumerate(test_dataloader):
-        images, ids = data
+    for images, ids in test_dataloader:
         images = images.to(device)
-        ids = ids.cpu().numpy()
+        outputs = model(images).squeeze()
+        for id, output in zip(ids, outputs):
+            predictions.append((id.item(), output.item()))
 
-        outputs = model(images)
-        outputs_numpy = outputs.cpu().numpy().flatten()
-
-        predictions.append((ids, outputs_numpy))
-
+# Create a DataFrame with the predictions
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
-print(df_output)
 
-if (using_hpc):
-    output_dir = '/groups/CS156b/2024/butters'
-else:
-    output_dir = 'predictions'
-
+# Define output directory
+output_dir = '/groups/CS156b/2024/butters' if using_hpc else 'predictions'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
+# Save the predictions DataFrame to a CSV file
 output_file_path = os.path.join(output_dir, 'predictions_resnet152_cardio_3epoch.csv')
 df_output.to_csv(output_file_path, index=False)
 
