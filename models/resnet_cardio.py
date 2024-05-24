@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 pathology = 'Cardiomegaly'
 using_hpc = 1
 use_subset = True
-subset_fraction = 0.2
+subset_fraction = 0.1
 
 if using_hpc == 1:
     labels_path_train = '/groups/CS156b/data/student_labels/train2023.csv'
