@@ -10,10 +10,10 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-pathology = 'Pleural Effusion'
+pathology = 'Enlarged Cardiomediastinum'
 using_hpc = 1
 use_subset = True
-subset_fraction = 0.01
+subset_fraction = 0.5
 
 if using_hpc == 1:
     labels_path_train = '/groups/CS156b/data/student_labels/train2023.csv'
@@ -134,7 +134,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 
 model.to(device)
 
-n_epochs = 3
+n_epochs = 2
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
@@ -185,7 +185,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the predictions DataFrame to a CSV file
-output_file_path = os.path.join(output_dir, 'predictions_densenet121_3epoch.csv')
+output_file_path = os.path.join(output_dir, 'predictions_densenet_enlarged_cardio.csv')
 df_output.to_csv(output_file_path, index=False)
 
 print(f"DataFrame saved to {output_file_path}")
