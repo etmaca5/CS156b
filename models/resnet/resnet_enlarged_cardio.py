@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 pathology = 'Enlarged Cardiomediastinum'
 using_hpc = 1
 use_subset = True
-subset_fraction = 0.1
+subset_fraction = 0.5
 
 if using_hpc == 1:
     labels_path_train = '/groups/CS156b/data/student_labels/train2023.csv'
@@ -174,7 +174,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the predictions DataFrame to a CSV file
-output_file_path = os.path.join(output_dir, 'predictions_resnet152_enlarged_3epoch.csv')
+output_file_path = os.path.join(output_dir, 'predictions_resnet152_enlarged_cardio.csv')
 df_output.to_csv(output_file_path, index=False)
 
 print(f"DataFrame saved to {output_file_path}")
