@@ -20,7 +20,7 @@ labels_of_interest = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly'
 pathology = 'Cardiomegaly'
 # will determine how we run it
 using_hpc = 1
-use_subset = True
+use_subset = False
 subset_fraction = 0.01
 n_epochs = 2
 output_name = 'cnn_cardiomegaly.csv'

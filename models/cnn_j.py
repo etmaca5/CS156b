@@ -117,7 +117,7 @@ transform=transforms.Compose([
     transforms.Resize((256,256)),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
-    transforms.Normalize([0.5, 0.5, 0.5], [0.25, 0.25, 0.25])
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 X_train = ImageDataset(images_path,labels_path_train, transform)
@@ -177,7 +177,7 @@ def initialize_model():
         nn.ReLU(),
         nn.Dropout(0.5),
         nn.Linear(512, 1),
-        nn.Tanh()
+        # nn.Tanh()
     )
     return model
 
@@ -205,6 +205,7 @@ validation_loss_history = np.zeros(n_epochs)
 #         loss.backward()
 #         optimizer.step()
 #         # Additional logging or accuracy computation here
+
 for epoch in range(n_epochs):
     model.train()
     for images, labels in train_dataloader:
