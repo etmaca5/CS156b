@@ -10,7 +10,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-pathology = 'Pleural Effusion'
+pathology = 'No Finding'
 using_hpc = 1
 use_subset = True
 subset_fraction = 1.0
@@ -185,7 +185,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the predictions DataFrame to a CSV file
-output_file_path = os.path.join(output_dir, 'predictions_densenet_pleural_effusion.csv')
+output_file_path = os.path.join(output_dir, 'predictions_densenet_no_finding.csv')
 df_output.to_csv(output_file_path, index=False)
 
 print(f"DataFrame saved to {output_file_path}")
