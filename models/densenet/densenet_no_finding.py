@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 pathology = 'No Finding'
 using_hpc = 1
 use_subset = True
-subset_fraction = 1.0
+subset_fraction = 0.5
 
 if using_hpc == 1:
     labels_path_train = '/groups/CS156b/data/student_labels/train2023.csv'
