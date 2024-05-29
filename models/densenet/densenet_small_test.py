@@ -10,22 +10,19 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-# Configuration and paths
 pathology = 'Pleural Effusion'
 using_hpc = 1
 use_subset = True
-subset_fraction = 0.1
+subset_fraction = 0.01
 
 if using_hpc == 1:
     labels_path_train = '/groups/CS156b/data/student_labels/train2023.csv'
     labels_path_test = '/groups/CS156b/data/student_labels/test_ids.csv'
     images_path = '/groups/CS156b/data'
-    output_dir = '/groups/CS156b/2024/butters'
 else:
     labels_path_train = 'labels/labels.csv'
     labels_path_test = 'labels/test_ids.csv'
     images_path = ''
-    output_dir = 'predictions'
 
 class ImageDataset(Dataset):
     def __init__(self, data_dir, image_list_file, transform=None):
@@ -93,8 +90,7 @@ class TestDataset(Dataset):
 
     def __len__(self):
         return len(self.data_frame)
-
-# Transformations and datasets
+    
 transform = transforms.Compose([
     transforms.Resize((256, 256)),
     transforms.CenterCrop(224),
@@ -115,19 +111,30 @@ train_dataloader = DataLoader(X_train, batch_size=batch, shuffle=True)
 val_dataloader = DataLoader(X_val, batch_size=batch, shuffle=True)
 test_dataloader = DataLoader(X_test, batch_size=batch, shuffle=False)
 
-print("Completed preprocessing")
+print("completed preprocessing")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Load a pretrained ResNet-152 model and adjust the final layer
-model = torchvision.models.resnet152(pretrained=True)
-model.fc = nn.Linear(model.fc.in_features, 1)
-model.to(device)
+# Load a pretrained DenseNet-121 model and adjust the final layer
+model = torchvision.models.densenet121(weights=torchvision.models.DenseNet121_Weights.DEFAULT)
 
+num_features = model.classifier.in_features
+model.classifier = nn.Sequential(nn.Linear(num_features, 512),
+                                 nn.ReLU(),
+                                 nn.Dropout(0.5),
+                                 nn.Linear(512, 256),
+                                 nn.ReLU(),
+                                 nn.Dropout(0.3),
+                                 nn.Linear(256, 128),
+                                 nn.ReLU(),
+                                 nn.Dropout(0.2),
+                                 nn.Linear(128, 1))
 criterion = nn.MSELoss()
 learning_rate = 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-n_epochs = 3
+model.to(device)
+
+n_epochs = 2
 training_loss_history = np.zeros(n_epochs)
 validation_loss_history = np.zeros(n_epochs)
 
@@ -159,11 +166,6 @@ for epoch in range(n_epochs):
         validation_loss_history[epoch] = validation_loss / len(val_dataloader)
     print(f'Validation Loss: {validation_loss_history[epoch]:0.4f}')
 
-# Save the trained model
-model_save_path = os.path.join(output_dir, 'resnet152_model.pth')
-torch.save(model.state_dict(), model_save_path)
-print(f"Model saved to {model_save_path}")
-
 # Collect predictions for the test set
 predictions = []
 with torch.no_grad():
@@ -177,12 +179,13 @@ with torch.no_grad():
 # Create a DataFrame with the predictions
 df_output = pd.DataFrame(predictions, columns=['Id', pathology])
 
-# Ensure the output directory exists
+# Define output directory
+output_dir = '/groups/CS156b/2024/butters' if using_hpc else 'predictions/attempts'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the predictions DataFrame to a CSV file
-output_file_path = os.path.join(output_dir, 'predictions_resnet152_3epoch.csv')
+output_file_path = os.path.join(output_dir, 'predictions_densenet_pleural_effusion.csv')
 df_output.to_csv(output_file_path, index=False)
 
 print(f"DataFrame saved to {output_file_path}")
