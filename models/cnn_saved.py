@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 pathology = 'Pleural Effusion'
 using_hpc = 1
 use_subset = False
-subset_fraction = 0.5
+subset_fraction = 0.3
 n_epochs = 4
 output_name = 'cnn.csv'
 
